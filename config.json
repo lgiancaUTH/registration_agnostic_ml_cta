@@ -6,4 +6,5 @@
     "log_path": "saved_model/log",
     "saved_model_path": "saved_model/model",
     "pretrained_registered_model_path": "pretrained_model_w_CLIP_loss/pretrained_registered_model",
+    "mask_file": "mask/anterior-lvo-seg-1mm-atlas.nii.gz"
 }
