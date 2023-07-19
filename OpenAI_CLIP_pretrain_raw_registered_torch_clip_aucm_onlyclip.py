@@ -181,7 +181,7 @@ def load_regis_image(img_path):
     full_brain = joinBrainNpy(maskedLeft, maskedRight)
     symCoord = int(full_brain.shape[0]/2)
 
-    MASK_FILE = '/data/giancardo-group/ydong4/stroke_training_analysis/atlas/anterior-lvo-seg-1mm-atlas.nii.gz'
+    MASK_FILE = config['mask_file']
     maskArr = nib.load(MASK_FILE).get_fdata().astype(int)
 
     bLeftMask = maskArr[symCoord:, :, :]
@@ -225,7 +225,7 @@ class CLIPDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = {}
 
-        raw_image, raw_up = load_raw_image(f"{CFG.image_path_raw}/{self.image_filenames[idx].split('.')[0]}_translated_rotated_croped.nii.gz") 
+        raw_image, raw_up = load_raw_image(f"{CFG.image_path_raw}/{self.image_filenames[idx].split('.')[0]}.nii.gz") 
         regisL, regisR, regis_image = load_regis_image(f"{CFG.image_path}/{self.image_filenames[idx]}")
         item['raw_image'] = torch.tensor(raw_image, dtype=torch.float32)
      
@@ -254,7 +254,7 @@ class CLIPDatasetND(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = {}
 
-        raw_image, raw_up = load_raw_image(f"{CFG.image_path_ND_raw}/{self.image_filenames[idx].split('.')[0]}_translated_rotated_croped.nii.gz") 
+        raw_image, raw_up = load_raw_image(f"{CFG.image_path_ND_raw}/{self.image_filenames[idx].split('.')[0]}.nii.gz") 
         regisL, regisR, regis_image = load_regis_image(f"{CFG.image_path_ND}/{self.image_filenames[idx]}")
         item['raw_image'] = torch.tensor(raw_image, dtype=torch.float32)
  
