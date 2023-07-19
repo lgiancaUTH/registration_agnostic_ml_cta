@@ -1,0 +1,9 @@
+{
+    "registered_img_path": "registered_img",
+    "unregistered_img_path": "unregistered_img",
+    "unregistered_img_path_test": "unregistered_img_valid",
+    "csv_path": "csv_files",
+    "log_path": "saved_model/log",
+    "saved_model_path": "saved_model/model",
+    "pretrained_registered_model_path": "pretrained_model_w_CLIP_loss/pretrained_registered_model",
+}
