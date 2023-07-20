@@ -1,7 +1,13 @@
 # Registration Agnostic ML CTA -- Under Construction
+
 Official implementation for paper "A Self-Supervised Learning Approach for Registration Agnostic Imaging Models with 3D Brain CTA"
 
+# Requirements
+
+```pip install -r requirements.txt```
+
 # Implementation
+
 Run python script
 ```python OpenAI_CLIP_pretrain_raw_registered_torch_clip_aucm_onlyclip.py```
 
