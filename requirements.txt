@@ -1,0 +1,13 @@
+python=3.9
+tensorboard
+numpy
+pandas
+matplotlib
+scikit-learn
+nilearn
+seaborn
+pytorch
+torchvision
+nibabel
+transformers
+libauc
