@@ -1,4 +1,6 @@
 import os, sys
+
+# Set GPU
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="5"
 os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
@@ -63,14 +65,16 @@ from torch.nn import LayerNorm
 from libauc.losses import AUCMLoss, CompositionalAUCLoss
 from libauc.optimizers import PESG, PDSCA
 
-# load config file
+# Load config file
 with open('/data/giancardo-group/ydong4/stroke_training_analysis/openai_clip/config.json') as json_file:
     config = json.load(json_file)
     json_file.close()
 
+# For global variables
 class CFG:
     seed = 1234
-    debug = False
+
+    # 3D CTA images folder path
     image_path = config['image_path']
     image_path_raw = config['image_path_raw']
     image_path_raw_test = config['image_path_raw_test']
@@ -89,11 +93,7 @@ class CFG:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     image_embedding = 72 
-    text_encoder_model = "distilbert-base-uncased"
-    text_embedding = 768
-    text_tokenizer = "distilbert-base-uncased"
-    max_length = 200
-
+    
     logging_steps = 10
 
     captions_path_log = config['log_path']
