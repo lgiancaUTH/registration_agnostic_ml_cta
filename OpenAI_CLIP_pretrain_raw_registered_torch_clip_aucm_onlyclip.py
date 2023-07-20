@@ -78,10 +78,14 @@ class CFG:
     image_path = config['image_path']
     image_path_raw = config['image_path_raw']
     image_path_raw_test = config['image_path_raw_test']
-    
+
+    # csv file path, for subject id
     captions_path = config['csv_path']
+    
     batch_size = 4 
     num_workers = 4 
+
+    # Learning rate
     head_lr = 1e-4
     image_encoder_lr = 1e-4
     raw_encoder_lr = 1e-4
@@ -96,15 +100,16 @@ class CFG:
     
     logging_steps = 10
 
+    # tensorboard log file saving path
     captions_path_log = config['log_path']
     directory =  "best_model_both_auc_" + str(datetime.now().strftime("%d_%m_%Y_%H:%M:%S"))
     tsbd_dir = os.path.join(captions_path_log, directory)
     os.makedirs(tsbd_dir) 
 
-
+    # saving model path
     model_file_name = {config['saved_model_path']}+'/best_model_both_auc_'
-    model_file_name_img = {config['saved_model_path']}+'/best_model_img_auc_'
-    model_file_name_txt = {config['saved_model_path']}+'/best_model_txt_auc_'
+    model_file_name_regis = {config['saved_model_path']}+'/best_model_img_auc_'
+    model_file_name_raw = {config['saved_model_path']}+'/best_model_txt_auc_'
     
     pretrained = True # for both image encoder and text encoder
     trainable = True # for both image encoder and text encoder
@@ -756,8 +761,8 @@ def main():
         if aucValSet > best_auc:
             best_auc = aucValSet
             torch.save(model.state_dict(), f'{CFG.model_file_name}{epoch+1}.pt' )
-            torch.save(model.image_encoder.state_dict(), f'{CFG.model_file_name_img}{epoch+1}.pt')
-            torch.save(model.raw_encoder.state_dict(), f'{CFG.model_file_name_txt}{epoch+1}.pt')
+            torch.save(model.image_encoder.state_dict(), f'{CFG.model_file_name_regis}{epoch+1}.pt')
+            torch.save(model.raw_encoder.state_dict(), f'{CFG.model_file_name_raw}{epoch+1}.pt')
             CFG.saved_best_model_name = f'{CFG.model_file_name}{epoch+1}.pt'
 
             print(f"Saved Best Model! at Epoch {epoch+1}, with val auc {best_auc}")
