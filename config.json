@@ -1,10 +1,10 @@
 {
-    "registered_img_path": "registered_img",
-    "unregistered_img_path": "unregistered_img",
-    "unregistered_img_path_test": "unregistered_img_valid",
-    "csv_path": "csv_files",
-    "log_path": "saved_model/log",
-    "saved_model_path": "saved_model/model",
-    "pretrained_registered_model_path": "pretrained_model_w_CLIP_loss/pretrained_registered_model",
-    "mask_file": "mask/anterior-lvo-seg-1mm-atlas.nii.gz"
+    "registered_img_path": "registered_img", # registered image training folder in absolute path format
+    "unregistered_img_path": "unregistered_img", # unregistered image training folder in absolute path format
+    "unregistered_img_path_test": "unregistered_img_valid", # unregistered image testing folder in absolute path format
+    "csv_path": "csv_files", # csv file for image id and label
+    "log_path": "saved_model/log", # log folder for tensorboard
+    "saved_model_path": "saved_model/model", # saved model folder
+    "pretrained_registered_model_path": "pretrained_model_w_CLIP_loss/pretrained_registered_model", # teacher model pretrained model
+    "mask_file": "mask/anterior-lvo-seg-1mm-atlas.nii.gz" # mask file
 }
