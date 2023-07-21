@@ -1,4 +1,4 @@
-# Registration Agnostic ML CTA -- Under Construction
+# Registration Agnostic ML CTA -- 🚧 Under Construction 🚧
 
 Official implementation for paper "A Self-Supervised Learning Approach for Registration Agnostic Imaging Models with 3D Brain CTA"
 
