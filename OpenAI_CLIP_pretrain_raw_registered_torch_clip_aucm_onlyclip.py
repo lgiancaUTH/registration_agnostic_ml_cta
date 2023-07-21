@@ -166,6 +166,7 @@ def normVol(maskTmp):
 
         return maskTmp
 
+# Load unregistered images 
 def load_raw_image(img_path):
 
     full_brain = nib.load(img_path).get_fdata()
@@ -175,7 +176,7 @@ def load_raw_image(img_path):
 
     return image
 
-
+# Load registered images
 def load_regis_image(img_path):
     image_npy = np.load(img_path, allow_pickle=True)
     leftBrain = image_npy.item().get('leftBrain')
@@ -215,6 +216,7 @@ def load_regis_image(img_path):
     maskedRight = np.expand_dims(maskedRight, axis=0)
     return maskedLeft.astype(np.float32), maskedRight.astype(np.float32), image
 
+# Split train, validation and test
 def make_train_valid_dfs(seedIn=1233):
     
     datasetGtFr = pd.read_csv(f"{CFG.captions_path}/report_split_train.csv")
@@ -235,6 +237,7 @@ def make_train_valid_dfs_ND_val(seedIn=1233):
 
     return datasetGtValFr, datasetGtTestFr 
 
+# Dataloader construction
 class CLIPDataset(torch.utils.data.Dataset):
     def __init__(self, image_filenames, label, transforms): 
         """
@@ -353,6 +356,7 @@ def set_parameter_requires_grad(model, feature_extracting):
         for param in model.parameters():
             param.requires_grad = False
 
+# unregistered images encoder
 class raw_encoder(nn.Module):
     def __init__(self):
         super().__init__()
@@ -477,7 +481,34 @@ class raw_encoder(nn.Module):
         x = torch.flatten(x,1)
         x = self.fc(x)
         return x
-    
+
+# Registered images encoder
+class img_txt_CLIP(nn.Module):
+    def __init__(
+        self,
+        temperature=CFG.temperature,
+        image_embedding=CFG.image_embedding,
+        text_embedding=CFG.text_embedding,
+    ):
+        super().__init__()
+
+        self.image_encoder = MyNet.torch_sNetAutoPreprocessingVggNetWithSkipConn(n_classes=1,
+                                                                    depthBefore=3, 
+                                                                    depthAfter=2, 
+                                                                    #activation='relu',
+                                                                    nFilters=24, 
+                                                                    nConv=3,
+                                                                    #globAvgPool=True,
+                                                                    addDenseLayerNeurons=15,
+                                                                    last_fc=False
+                                                                    )
+        self.image_encoder.to(CFG.device)
+        self.temperature = temperature
+    def forward(self, regisL, regisR):
+        image_features = self.image_encoder(regisL, regisR)
+        return image_features
+
+# Projection layers    
 class ProjectionHead(nn.Module):
     def __init__(
         self,
@@ -528,32 +559,7 @@ class ProjectionHead_raw(nn.Module):
         z = self.fc1(z)
         return x, z
 
-class img_txt_CLIP(nn.Module):
-    def __init__(
-        self,
-        temperature=CFG.temperature,
-        image_embedding=CFG.image_embedding,
-        text_embedding=CFG.text_embedding,
-    ):
-        super().__init__()
-
-        self.image_encoder = MyNet.torch_sNetAutoPreprocessingVggNetWithSkipConn(n_classes=1,
-                                                                    depthBefore=3, 
-                                                                    depthAfter=2, 
-                                                                    #activation='relu',
-                                                                    nFilters=24, 
-                                                                    nConv=3,
-                                                                    #globAvgPool=True,
-                                                                    addDenseLayerNeurons=15,
-                                                                    last_fc=False
-                                                                    )
-        self.image_encoder.to(CFG.device)
-        self.temperature = temperature
-    def forward(self, regisL, regisR):
-        image_features = self.image_encoder(regisL, regisR)
-        return image_features
-
-
+# Model based on CLIP-loss
 class CLIPModel(nn.Module):
     def __init__(
         self,
