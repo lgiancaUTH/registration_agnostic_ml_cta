@@ -146,6 +146,7 @@ def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group["lr"]
 
+# process registered images
 normLim = [0, 100]
 
 def joinBrainNpy(leftArr, rightArr):
@@ -214,6 +215,26 @@ def load_regis_image(img_path):
     maskedRight = np.expand_dims(maskedRight, axis=0)
     return maskedLeft.astype(np.float32), maskedRight.astype(np.float32), image
 
+def make_train_valid_dfs(seedIn=1233):
+    
+    datasetGtFr = pd.read_csv(f"{CFG.captions_path}/report_split_train.csv")
+
+    print('Training with {:} pos / {:} neg'.format(np.sum(datasetGtFr['label']==1),\
+                                                    np.sum(datasetGtFr['label']==0)))
+    return datasetGtFr
+
+def make_train_valid_dfs_ND_val(seedIn=1233):
+
+    datasetGtValFr = pd.read_csv(f'{CFG.captions_path}report_split_validation.csv')
+    datasetGtTestFr = pd.read_csv(f'{CFG.captions_path}report_split_test.csv')
+
+    print('Validation with {:} pos / {:} neg, Testing with {:} pos / {:} neg'.format(np.sum(datasetGtValFr['label']==1),\
+                                                                                    np.sum(datasetGtValFr['label']==0),\
+                                                                                    np.sum(datasetGtTestFr['label']==1),\
+                                                                                    np.sum(datasetGtTestFr['label']==0)))
+
+    return datasetGtValFr, datasetGtTestFr 
+
 class CLIPDataset(torch.utils.data.Dataset):
     def __init__(self, image_filenames, label, transforms): 
         """
@@ -271,6 +292,36 @@ class CLIPDatasetND(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.label)
+
+def build_loaders(dataframe, doShuffle=False):
+    dataset = CLIPDataset(
+        dataframe["image"].values,
+        dataframe["label"].values,
+        transforms=None,
+    )
+    # dataframe is full csv files
+    dataloader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=CFG.batch_size,
+        num_workers=CFG.num_workers,
+        shuffle=doShuffle,
+    )
+
+    return dataloader
+
+def build_loaders_ND(dataframe, doShuffle=False):
+    dataset = CLIPDatasetND(
+        dataframe["image"].values,
+        dataframe["label"].values,
+        transforms=None,
+    )
+    dataloader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=CFG.batch_size,
+        num_workers=CFG.num_workers,
+        shuffle=doShuffle,
+    )
+    return dataloader
 
 def get_fine_tuning_parameters(model, ft_begin_index):
     if ft_begin_index == 0:
@@ -587,57 +638,6 @@ def sigmoid(x): return (1 + (-x).exp()).reciprocal()
 
 def binary_cross_entropy(preds, targets): 
     return -(preds.log()*targets + (1-targets)*(1-preds).log()).mean()
-
-def make_train_valid_dfs(seedIn=1233):
-    
-    datasetGtFr = pd.read_csv(f"{CFG.captions_path}/report_split_train.csv")
-
-    print('Training with {:} pos / {:} neg'.format(np.sum(datasetGtFr['label']==1),\
-                                                    np.sum(datasetGtFr['label']==0)))
-    return datasetGtFr
-
-def make_train_valid_dfs_ND_val(seedIn=1233):
-
-    datasetGtValFr = pd.read_csv(f'{CFG.captions_path}report_split_validation.csv')
-    datasetGtTestFr = pd.read_csv(f'{CFG.captions_path}report_split_test.csv')
-
-    print('Validation with {:} pos / {:} neg, Testing with {:} pos / {:} neg'.format(np.sum(datasetGtValFr['label']==1),\
-                                                                                    np.sum(datasetGtValFr['label']==0),\
-                                                                                    np.sum(datasetGtTestFr['label']==1),\
-                                                                                    np.sum(datasetGtTestFr['label']==0)))
-
-    return datasetGtValFr, datasetGtTestFr 
-
-
-def build_loaders(dataframe, doShuffle=False):
-    dataset = CLIPDataset(
-        dataframe["image"].values,
-        dataframe["label"].values,
-        transforms=None,
-    )
-    # dataframe is full csv files
-    dataloader = torch.utils.data.DataLoader(
-        dataset,
-        batch_size=CFG.batch_size,
-        num_workers=CFG.num_workers,
-        shuffle=doShuffle,
-    )
-
-    return dataloader
-
-def build_loaders_ND(dataframe, doShuffle=False):
-    dataset = CLIPDatasetND(
-        dataframe["image"].values,
-        dataframe["label"].values,
-        transforms=None,
-    )
-    dataloader = torch.utils.data.DataLoader(
-        dataset,
-        batch_size=CFG.batch_size,
-        num_workers=CFG.num_workers,
-        shuffle=doShuffle,
-    )
-    return dataloader
 
 def round_nd_array(array):
         return [round(val, 4) for val in array]
